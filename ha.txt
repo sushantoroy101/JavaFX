@@ -1,1 +1,290 @@
-Shoot
+package pack;
+
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.activation.UnsupportedDataTypeException;
+
+import javafx.animation.Animation;
+import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Application;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+
+
+
+
+public class Shoot extends Application{
+	
+	public enum Direction{
+		UP,DOWN
+	}
+	
+	Direction direction = Direction.DOWN;
+	Direction direction2 = Direction.UP;
+	
+    Pane root  = new Pane();
+	
+    PlayerSuply me = new PlayerSuply(0, 200, 15, 30, "valo", Color.BLUE);
+    PlayerSuply sotru = new PlayerSuply(350, 200, 15, 20, "sotru", Color.BROWN);
+    PlayerSuply sotru2 = new PlayerSuply(350, 100, 15, 20, "sotru2", Color.BLUEVIOLET);
+    
+	public static void main(String[] args) {
+		launch(args);
+	}
+	
+	public List<PlayerSuply> naoamdr(){
+		
+		return root.getChildren().stream().map(n -> (PlayerSuply)n).collect(Collectors.toList());
+		
+	}
+	
+	int marbi = 1;
+	int marbi2 = 1;
+
+	public void updateall() {
+		
+		naoamdr().forEach(hayhay -> {
+			
+			switch (hayhay.type) {
+			case "valobullet":
+			  hayhay.moveRight();
+			  if(hayhay.getBoundsInParent().intersects(sotru.getBoundsInParent()))
+					sotru.dead = true;
+			  if(hayhay.getBoundsInParent().intersects(sotru2.getBoundsInParent()))
+					sotru2.dead = true;
+				break;
+
+			case "sotru":
+				double y;
+				y=sotru.getTranslateY();
+				if(y<10 && direction==Direction.UP) 
+				{
+					    sotru.moveDown();
+						direction = Direction.DOWN;
+						if(marbi%80==0) {
+							shoot(hayhay);
+						}
+						marbi++;
+							
+				}
+				else if(y<390 && direction==Direction.DOWN) {
+					sotru.moveDown();
+					direction=Direction.DOWN;
+					if(marbi%80==0) {
+						shoot(hayhay);
+					}
+					marbi++;
+				}
+				else if(y>390 && direction==Direction.DOWN)
+				{
+					sotru.moveUp();
+					direction = Direction.UP;
+					if(marbi%80==0) {
+						shoot(hayhay);
+					}
+					marbi++;
+				}
+				else {
+					sotru.moveUp();
+					direction = Direction.UP;
+					if(marbi%80==0) {
+						shoot(hayhay);
+					}
+					marbi++;
+				}
+				
+				
+				break;
+			case "sotrubullet":
+				hayhay.moveLeft();
+				if(hayhay.getBoundsInParent().intersects(me.getBoundsInParent()))
+					me.dead = true;
+				break;
+				
+			case "sotru2":
+					double y2;
+				y2=sotru2.getTranslateY();
+				if(y2<10 && direction2==Direction.UP) 
+				{
+					    sotru2.moveDown();
+						direction2 = Direction.DOWN;
+						if(marbi2%90==0) {
+							shoot(hayhay);
+						}
+						marbi2++;
+							
+				}
+				else if(y2<390 && direction2==Direction.DOWN) {
+					sotru2.moveDown();
+					direction2=Direction.DOWN;
+					if(marbi2%90==0) {
+						shoot(hayhay);
+					}
+					marbi2++;
+				}
+				else if(y2>390 && direction2==Direction.DOWN)
+				{
+					sotru2.moveUp();
+					direction2 = Direction.UP;
+					if(marbi2%90==0) {
+						shoot(hayhay);
+					}
+					marbi2++;
+				}
+				else {
+					sotru2.moveUp();
+					direction2 = Direction.UP;
+					if(marbi2%90==0) {
+						shoot(hayhay);
+					}
+					marbi2++;
+				}
+				
+				break;
+				
+			case "sotru2bullet":
+				hayhay.moveLeft();
+				if(hayhay.getBoundsInParent().intersects(me.getBoundsInParent()))
+					me.dead = true;
+				break;
+			}
+			
+			
+			
+		});
+		
+		if(marbi>10000)
+			marbi = 0;
+		if(marbi2>2000)
+			marbi2=0;
+		
+	    root.getChildren().removeIf(n -> {
+            PlayerSuply s = (PlayerSuply) n;
+            return s.dead;
+        });
+	}
+	
+	public Parent daoaktaroot()
+	{
+		root.setPrefHeight(400);
+		root.setPrefWidth(400);
+		
+		AnimationTimer timer = new AnimationTimer() {
+
+			@Override
+			public void handle(long arg0) {
+			
+				updateall();
+			}
+			
+			
+		};
+		
+	    timer.start();
+	    root.getChildren().add(sotru2);
+	    root.getChildren().add(sotru);
+		root.getChildren().add(me);
+		return root;
+	}
+	
+	public void shoot(PlayerSuply s) {
+		if((s.type).equals("valo")) {
+       PlayerSuply bullet = new PlayerSuply(30, (int)s.getTranslateY()+5, 5, 10, s.type+"bullet", Color.RED);
+       root.getChildren().add(bullet);
+		} 
+       
+		else if((s.type).equals("sotru")) {
+		       PlayerSuply bullet = new PlayerSuply(350, (int)s.getTranslateY()+5, 5, 10, s.type+"bullet", Color.BLACK);
+		       root.getChildren().add(bullet);
+				} 
+		else if((s.type).equals("sotru2")) {
+		       PlayerSuply bullet = new PlayerSuply(350, (int)s.getTranslateY()+5, 5, 10, s.type+"bullet", Color.BLACK);
+		       root.getChildren().add(bullet);
+				} 
+	}
+	
+	@Override
+	public void start(Stage arg0) throws Exception {
+		
+		Scene scene = new Scene(daoaktaroot(),Color.CHARTREUSE);
+		
+        scene.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case UP:
+                    me.mymoveUp();
+                    break;
+                case DOWN:
+                    me.mymoveDown();
+                    break;
+                case SPACE:
+                    shoot(me);
+                    break;
+            }
+        });
+
+		arg0.setScene(scene);
+		arg0.show();
+		
+	}
+
+}
+////////////////////////////////////////////////////////////
+
+package pack;
+
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+
+public class PlayerSuply extends Rectangle{
+	
+	String type;
+	
+	boolean dead= false;
+	
+	 PlayerSuply(int x, int y, int h,int w,String type,Color color) {
+	
+		 super(w,h,color);
+		 
+		 this.type = type;
+		 
+		 setTranslateX(x);
+		 setTranslateY(y);
+	}
+
+	 void moveDown() {
+		 setTranslateY(getTranslateY()+2);
+	 }
+	 
+	 void moveUp()
+	 {
+		 setTranslateY(getTranslateY()-2);
+	 }
+	 void mymoveDown() {
+		 setTranslateY(getTranslateY()+5);
+	 }
+	 
+	 void mymoveUp()
+	 {
+		 setTranslateY(getTranslateY()-5);
+	 }
+	 void moveRight()
+	 {
+		 setTranslateX(getTranslateX()+3);
+	 }
+	 void moveLeft()
+	 {
+		 setTranslateX(getTranslateX()-3);
+	 }
+	 
+}
